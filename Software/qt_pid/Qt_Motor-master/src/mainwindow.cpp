@@ -48,15 +48,6 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     Serialll = new QSerialPort(this);
-    // QIODevice::ReadWrite là một cờ được sử dụng để mở kết nối serial với quyền truyền và nhận dữ liệu.
-    // Cờ này cho phép ứng dụng có thể gửi và nhận dữ liệu trên kết nối serial.
-    //    QString str_1 = "Alo anh em";
-    //    qDebug() << str_1;
-    //    QString str2 = QString(3, 'a');
-    //    qDebug() << str2;
-    //    int i = 10;
-    //    QString str3 = QString::number(i,16);
-    //    qDebug() << str3;
     updateCOM();
     customize_ui();
 }
@@ -74,9 +65,6 @@ void MainWindow::customize_ui()
     ui->lineEdit_Kp->setStyleSheet("border: 1.3px solid blue");
     ui->lineEdit_Ki->setStyleSheet("border: 1.3px solid blue");
     ui->lineEdit_Kd->setStyleSheet("border: 1.3px solid blue");
-    //    ui->label_Kp->setStyleSheet("font-weight: bold; color: black");
-    //    ui->label_Ki->setStyleSheet("font-weight: bold; color: black");
-    //    ui->label_Kd->setStyleSheet("font-weight: bold; color: black");
     ui->PID1->setStyleSheet("font-weight: bold; color: rgb(255, 85, 167)");
     ui->PID2->setStyleSheet("font-weight: bold; color: rgb(255, 85, 167)");
     ui->sendPID->setStyleSheet("font-weight: bold; color: rgb(140, 0, 255)");
@@ -84,8 +72,6 @@ void MainWindow::customize_ui()
     ui->pushButton_disconnect->setStyleSheet("font-weight: bold; color: rgb(255, 0, 0)");
     ui->pushButton_reload->setStyleSheet("font-weight: bold; color: rgb(0, 170, 127)");
     ui->lineEdit_setpoint->setStyleSheet("border: 1.3px solid green");
-    //    ui->pushButton_position->setStyleSheet("font-weight: bold; color: rgb(246, 255, 246)");
-    //    ui->pushButton_velocity->setStyleSheet("font-weight: bold; color: rgb(246, 255, 246)");
     ui->lineEdit_Kp->setValidator(new QDoubleValidator);
     ui->lineEdit_Ki->setValidator(new QDoubleValidator);
     ui->lineEdit_Kd->setValidator(new QDoubleValidator);
@@ -120,10 +106,9 @@ void MainWindow::on_Select_COM_clicked()
     select_baud = ui->comboBox_Baud->currentText();
     Serialll->setPortName(select_com);
     ui->comboBox_COM->setEnabled(false);
-    //       Serialll->setBaudRate(QSerialPort::Baud115200);
     Serialll->setBaudRate(select_baud.toInt());
     ui->comboBox_Baud->setEnabled(false);
-    Serialll->setDataBits(QSerialPort::Data8); // sua 8 bit 9 bit gi thi sua o day, cứng sẵn trong code cho nhanh
+    Serialll->setDataBits(QSerialPort::Data8);
     Serialll->setParity(QSerialPort::NoParity);
     Serialll->setStopBits(QSerialPort::OneStop);
     Serialll->open(QIODevice::ReadWrite);
@@ -164,19 +149,10 @@ void MainWindow::on_pushButton_readData_clicked()
     checkContRead = true;
     if (Serialll->isOpen())
     {
-        // connect(Serialll, &QSerialPort::readyRead, this, &MainWindow::readDataFromSTM);
         timer = new QTimer(this);
         timer->setTimerType(Qt::PreciseTimer); // higher priority
         connect(timer, SIGNAL(timeout()), this, SLOT(readDataFromSTM()));
-        //        if(checkPosi == 1)
-        //        {
         timer->start(20);
-        //        }
-        //        else if(checkVelo == 1)
-        //        {
-        //            timer->start(20);
-        //        }
-
         qDebug() << "Read Data okay";
         ui->textBrowser->setTextColor(Qt::blue);
         ui->textBrowser->setText("Ready to read!");
@@ -206,10 +182,8 @@ void MainWindow::readDataFromSTM()
     {
         data_read.clear();
         data_read = Serialll->readAll();
-        //        qDebug() << "data read la: " << data_read;
         call_get_data.call_get_dataFromSTM(); // readAll nay tra ve du lieu kieu Qbytearray nen phai khai bao nhu the
-                                              // qDebug() << "qstring data_read[1]: " << (QString("0x%1 ").arg(data_read[1], 2, 16, QChar('0')));
-        if ((rx_buff[0] == 0x66) && call_get_data.call_get_dataFromSTM() == Phuc_right)
+        if ((rx_buff[0] == 0x66) && call_get_data.call_get_dataFromSTM() == rightt)
         {
             display1++;
             if (display1 == 2 || display1 == 200) // de cho no it hien cai nay thoi
@@ -217,36 +191,16 @@ void MainWindow::readDataFromSTM()
                 ui->textBrowser_command->append("----------------------");
                 ui->textBrowser_command->append("Position");
             }
-            //            QString checkmap = QString::number(check_true);
-            //            if (call_get_data.call_get_dataFromSTM() >= 0)
-            //            {
-            //            connect(ui->pushButton_clearGraph, SIGNAL(clicked()), this, SLOT(on_pushButton_clearGraph_clicked()));
+
             if (checkClear != 1)
             {
                 float rx_buffToFloat = *((float *)(rx_buff + 1)); // do byte dau la chon graph vi tri hay van toc nen phai +1 de bo byte do
-                                                                  // all_data.append(rx_buffToFloat);
-                                                                  // qDebug() << "all_data la: " << all_data;
                 ui->textBrowser->setTextColor(Qt::black);
                 QString data = QString::number(rx_buffToFloat);
                 QDateTime local_time(QDateTime::currentDateTime());
                 QString local_timeToString = local_time.toString("yyyy-MM-dd HH:mm:ss.zzz");
                 QString data_timenow = data + "   " + local_timeToString;
                 ui->textBrowser->append(data_timenow);
-                //                all_data.append(data + " ");
-                //                qDebug() << "all_data la: " << all_data;
-                //                qDebug() << "size cua all_data la: " << all_data.size();
-                //                counterPosi++;
-                //                values = QString(all_data).split(" ");
-                //                qDebug() << "size cua values la: " << values.size();
-                //                for (int i = 0; i < values.size(); i++)
-                //                {
-                //                    value = values[i].toDouble();
-                //                    dataPoints.append(value);
-                //                }
-                //                if (counterPosi = 1)
-                //                {
-                //
-                //----
                 if (checkBtnPlot2 == 1)
                 {
                     qDebug() << "checkBtnPlot2 la: " << checkBtnPlot2;
@@ -258,26 +212,9 @@ void MainWindow::readDataFromSTM()
                     }
                 }
                 values.append(data);
-                //                qDebug() << "values la: " << values;
-                //                value = values[jValues++].toDouble();
-                //                qDebug() << "jvalues la: " << jValues;
-                //                dataPoints.append(value);
-                //                for (int i = 0; i < values.size(); i++)
-                //                {
-                //                    value = values[i].toDouble();
-                //                    dataPoints.append(value);
-                //                }
-                //                qDebug() << "dataPoints la: " << dataPoints;
-                //----
-                //                qDebug() << "values la: " << values;
-
-                //                    qDebug() << "dataPoints la: " << dataPoints;
-                //                }
             }
         }
-
-        //       else if ((QString("0x%1").arg(data_read[1], 2, 16, QChar('0'))) == "0x77" && call_get_data.call_get_dataFromSTM() == Phuc_right)
-        else if ((rx_buff[0] == 0x77) && call_get_data.call_get_dataFromSTM() == Phuc_right)
+        else if ((rx_buff[0] == 0x77) && call_get_data.call_get_dataFromSTM() == rightt)
         {
             display2++;
             if (display2 == 2 || display2 == 200)
@@ -285,16 +222,9 @@ void MainWindow::readDataFromSTM()
                 ui->textBrowser_command->append("----------------------");
                 ui->textBrowser_command->append("Velocity");
             }
-            //            QString checkmap = QString::number(check_true);
-            //            ui->textBrowser->append(checkmap);
-            //            if (call_get_data.call_get_dataFromSTM() >= 0)
-            //            {
-            //            connect(ui->pushButton_clearGraph, SIGNAL(clicked()), this, SLOT(on_pushButton_clearGraph_clicked()));
             if (checkClear != 1)
             {
                 float rx_buffToFloat = *((float *)(rx_buff + 1)); // do byte dau la chon graph vi tri hay van toc nen phai +1 de bo byte do
-                                                                  //         all_data.append(rx_buffToFloat);
-                                                                  //        qDebug() << "all_data la: " << all_data;
                 ui->textBrowser->setTextColor(Qt::black);
                 QString data = QString::number(rx_buffToFloat);
                 QDateTime local_time(QDateTime::currentDateTime());
@@ -314,21 +244,16 @@ void MainWindow::readDataFromSTM()
                 }
                 values.append(data);
             }
-            //       qDebug() << "all_data la: " << all_data;
         }
-        // else if (call_get_data.call_get_dataFromSTM() == Phuc_no_valid)
-        // {
-        //     ui->textBrowser_command->append("No valid message found");
-        // }
-        else if (call_get_data.call_get_dataFromSTM() == Phuc_false_CRC)
+        else if (call_get_data.call_get_dataFromSTM() == false_CRC)
         {
             ui->textBrowser_command->append("Invalid CRC");
         }
-        else if ((call_get_data.call_get_dataFromSTM() == Phuc_buffer_small))
+        else if ((call_get_data.call_get_dataFromSTM() == buffer_small))
         {
             ui->textBrowser_command->append("Destination buffer too small");
         }
-        else if ((call_get_data.call_get_dataFromSTM() == Phuc_false_lenght_data))
+        else if ((call_get_data.call_get_dataFromSTM() == false_lenght_data))
         {
             ui->textBrowser_command->append("False lenght data");
         }
@@ -343,36 +268,12 @@ void MainWindow::readDataFromSTM()
 int8_t SerialProto::call_get_dataFromSTM()
 {
     SerialProto get_data;
-       // qDebug() << "data data_read la: " << data_read.data();
-       // qDebug() << "data_read la: " << data_read;
-       // qDebug() << QString("dataread[0] = 0x%1").arg(data_read[0], 2, 16, QChar('0'));
-       // qDebug() << QString("dataread[1] = 0x%1").arg(data_read[1], 2, 16, QChar('0'));
-       // qDebug() << QString("dataread[2] = 0x%1").arg(data_read[2], 2, 16, QChar('0'));
-       // qDebug() << QString("dataread[3] = 0x%1").arg(data_read[3], 2, 16, QChar('0'));
-       // qDebug() << QString("dataread[4] = 0x%1").arg(data_read[4], 2, 16, QChar('0'));
-       // qDebug() << QString("dataread[5] = 0x%1").arg(data_read[5], 2, 16, QChar('0'));
-       // qDebug() << QString("dataread[6] = 0x%1").arg(data_read[6], 2, 16, QChar('0'));
-       // qDebug() << QString("dataread[7] = 0x%1").arg(data_read[7], 2, 16, QChar('0'));
-       // qDebug() << QString("dataread[8] = 0x%*/1").arg(data_read[8], 2, 16, QChar('0'));
-       // qDebug() << QString("dataread[9] = 0x%1").arg(data_read[9], 2, 16, QChar('0'));
-       // qDebug() << QString("dataread[10] = 0x%1").arg(data_read[10], 2, 16, QChar('0'));
-       // qDebug() << QString("dataread[11] = 0x%1").arg(data_read[11], 2, 16, QChar('0'));
-       // qDebug() << QString("dataread[12] = 0x%1").arg(data_read[12], 2, 16, QChar('0'));
-    //    qDebug() << QString("dataread[13] = 0x%1").arg(data_read[13], 2, 16, QChar('0'));
-    //    qDebug() << "size of data_Read" << data_read.size();
-    //    qDebug() << QString("rx_buff[0] = 0x%1").arg(data_read[0], 2, 16, QChar('0'));
     check_true = get_data.serialGetData(reinterpret_cast<uint8_t *>(data_read.data()), data_read.size(), rx_buff, &rx_buff_size); // rx_buff se chua data la 0x66/0x77 + now_position/velocity_real
-                                                                                                                                  //    qDebug() << "rx buff size la: " << rx_buff_size;
-                                                                                                                                  //    for (int i = 0; i < sizeof(rx_buff); i++)
-                                                                                                                                  //    {
-                                                                                                                                  //        qDebug() << "rx_buff la: " << rx_buff[i];
-                                                                                                                                  //    }
     return check_true;
 }
 void SerialProto::call_create_frameQt()
 {
     SerialProto frame_data;
-    // frameBuffLenght = byteArray.length() + 4;
     for (int i = 0; i < sizeof(frameBuffer); i++)
     {
         frameBuffer[i] = 0x00;
@@ -396,11 +297,6 @@ void MainWindow::updateGraph()
     if (checkBtnPlot1 == 1)
     {
         checkBtnPlot2 = 0;
-
-        // ------------------------------------------------------------------------------ real -----------------------
-        // Add new data
-        //       values = QString(all_data).split(" ");
-
         checkContinue++;
         if (checkFirst == 0)
         {
@@ -413,33 +309,17 @@ void MainWindow::updateGraph()
             }
             checkSizeValues = values.size();
             dataPointsVector = QVector<double>::fromList(dataPoints);
-            //        dataPointsVector.removeLast();
-            //        static QVector<double> x(dataPointsVector.size());
             x.resize(dataPointsVector.size());
             qDebug() << "Size cua dataPointsVector la: " << dataPointsVector.size();
             qDebug() << "Data cua dataPointsVector la: " << dataPointsVector.data();
-            //   connect(ui->pushButton_clearGraph, SIGNAL(clicked()), this, SLOT(on_pushButton_clearGraph_clicked()));
-            //        QElapsedTimer timer_elapse;
-            //        timer_elapse.start();
             checkSizeDataVector = dataPointsVector.size();
             for (qint64 i = 0; i < dataPointsVector.size(); i++)
-            {
-                //            x[i] = timer_elapse.elapsed() + i*0.01;
-                //    x[i] = time.elapsed()/1000.0 + i * 0.01; // elapsed la thoi gian da troi qua tu khi timer dc start , cong i*0.05 la cong don tich luy may cai thoi gian cũ thoi
+            {               
                 x[i] = i;
-                //            if (dataPointsVector.size() > 1500)
-                //            {
-                //                timer->stop();
-                //            }
             }
-            //         qDebug() << "checkSizeValues(top) la: " << checkSizeValues;
-            //         qDebug() << "dataPointsVector top la: " << dataPointsVector;
         }
         if (checkContinue >= 2)
         {
-            //            qDebug() << "checkContinue la: " << checkContinue;
-            //            qDebug() << "checkSizeValues(bottom) la: " << checkSizeValues;
-            //            qDebug() << "values.size()(bottom) - checkSizeValues la : " << values.size() - checkSizeValues;
             checkContinue = 2;
             for (int i = checkSizeValues; i < (values.size()); i++)
             {
@@ -448,9 +328,6 @@ void MainWindow::updateGraph()
             }
             checkSizeValues = values.size();
             dataPointsVector = QVector<double>::fromList(dataPoints);
-            //            dataPointsVector.removeLast();
-            //            qDebug() << "checkSizeDataVector la: " << checkSizeDataVector;
-            //            qDebug() << "dataPointsVector.size()(bottom) - checkSizeDataVector la: " << dataPointsVector.size() - checkSizeDataVector;
             x.resize(dataPointsVector.size());
             for (qint64 i = checkSizeDataVector; i < (dataPointsVector.size()); i++)
             {
@@ -464,28 +341,12 @@ void MainWindow::updateGraph()
             }
             checkSizeDataVector = dataPointsVector.size();
         }
-        // test ----------
-        //        static QTime time(QTime::currentTime());
-        //        double key = time.elapsed()/1000.0;
-        //        static double lastPointKey = 0;
-        //        if(key - lastPointKey > 0.01)
-        //        {
-        //            x.append(key);
-        //            lastPointKey = key;
-        //        }
-        //        ui->customPlot1->graph(0)->setData(x, dataPointsVector);
-        // test ----------
-        //       qDebug() << "dataPointsVector khi ve la: " << dataPointsVector;
         ui->customPlot1->graph(0)->addData(x, dataPointsVector);
         ui->customPlot1->graph(1)->setData(x, setPointValue);
-        //        ui->customPlot1->xAxis->setRange(0,100);
-        //        ui->customPlot1->yAxis->setRange(-100,100);
         // Rescale and redraw graph
         ui->customPlot1->rescaleAxes();
         ui->customPlot1->replot();
         ui->customPlot1->update();
-        //       dataPoints.clear();
-        //      ui->customPlot1->graph(0)->data()->clear();
     }
 }
 // ------------------------------------------------------------------------------ real ---------
@@ -521,10 +382,7 @@ void MainWindow::updateGraph_realTime()
             value = values[i].toDouble();
             dataPoints.append(value);
         }
-        //        qDebug() << "dataPoints real time la: " << dataPoints;
-        //        qDebug() << "size dataPoints2 la: " << dataPoints.size();
         dataPointsVector = QVector<double>::fromList(dataPoints);
-        //        qDebug() << "dataPointsVector real time la: " << dataPointsVector;
         x2.resize(dataPointsVector.size());
         for (qint64 i = 0; i < dataPointsVector.size(); i++)
         {
@@ -532,8 +390,6 @@ void MainWindow::updateGraph_realTime()
         }
         ui->customPlot2->graph(0)->addData(x2, dataPointsVector);
         ui->customPlot2->graph(1)->setData(x2, setPointValue);
-        //        ui->customPlot2->yAxis2->setRange(ui->lineEdit_setpoint->text().toDouble() - 80, ui->lineEdit_setpoint->text().toDouble() + 80);
-        //        ui->customPlot2->xAxis2->rescale();
         if (checkPosi == 1)
         {
             ui->customPlot2->xAxis->rescale();
@@ -553,13 +409,8 @@ void MainWindow::updateGraph_realTime()
         }
         ui->customPlot2->replot();
         ui->customPlot2->update();
-        //        if(btnResetClick == false)
-        //        {
         dataPoints.clear();
         ui->customPlot2->graph(0)->data()->clear();
-        //        }
-
-        //        qDebug() << "Size cua dataPointsVector2 la: %d" << dataPointsVector.size();
     }
 }
 
@@ -574,32 +425,10 @@ void MainWindow::on_sendPID_clicked()
     byteArray.append(reinterpret_cast<const char *>(&Kp), sizeof(Kp));
     byteArray.append(reinterpret_cast<const char *>(&Ki), sizeof(Ki));
     byteArray.append(reinterpret_cast<const char *>(&Kd), sizeof(Kd));
-    // test ------------------
-    //    byteArray.clear();
-    //    byteArray.append(0x53);
-    //    byteArray.append(0x02);
-    //    byteArray.append(0x42);
-    //    byteArray.append(0x03);
-    //    byteArray.append(0x05);
-    //  ----------------------
     SerialProto frame_call;
     frame_call.call_create_frameQt();
     QByteArray send_frame = QByteArray((char *)frameBuffer, frameBuffLenght);
     qDebug() << "send_frame tao frame thanh: " << send_frame;
-    //    qDebug() << QString("send_frame[0] = 0x%1").arg(send_frame[0], 2, 16, QChar('0'));
-    //    qDebug() << QString("send_frame[1] = 0x%1").arg(send_frame[1], 2, 16, QChar('0'));
-    //    qDebug() << QString("send_frame[2] = 0x%1").arg(send_frame[2], 2, 16, QChar('0'));
-    //    qDebug() << QString("send_frame[3] = 0x%1").arg(send_frame[3], 2, 16, QChar('0'));
-    //    qDebug() << QString("send_frame[4] = 0x%1").arg(send_frame[4], 2, 16, QChar('0'));
-    //    qDebug() << QString("send_frame[5] = 0x%1").arg(send_frame[5], 2, 16, QChar('0'));
-    //    qDebug() << QString("send_frame[6] = 0x%1").arg(send_frame[6], 2, 16, QChar('0'));
-    //    qDebug() << QString("send_frame[7] = 0x%1").arg(send_frame[7], 2, 16, QChar('0'));
-    //    qDebug() << QString("send_frame[8] = 0x%1").arg(send_frame[8], 2, 16, QChar('0'));
-    //    qDebug() << QString("send_frame[9] = 0x%1").arg(send_frame[9], 2, 16, QChar('0'));
-    //    qDebug() << QString("send_frame[10] = 0x%1").arg(send_frame[10], 2, 16, QChar('0'));
-    //    qDebug() << QString("send_frame[11] = 0x%1").arg(send_frame[11], 2, 16, QChar('0'));
-    //    qDebug() << QString("send_frame[12] = 0x%1").arg(send_frame[12], 2, 16, QChar('0'));
-    qDebug() << "do dai frame tu ham` la: " << frameBuffLenght;
     if (Serialll->isOpen())
     {
         Serialll->write(send_frame);
@@ -654,7 +483,6 @@ void MainWindow::on_pushButton_velocity_clicked()
 {
     checkPosi = 0;
     checkVelo = 1;
-    //    checkRescale = true;
     setPointValue.fill(0);
     double setPoint = ui->lineEdit_setpoint->text().toDouble();
     setPointValue.fill(setPoint);
@@ -755,34 +583,12 @@ void MainWindow::on_pushButton_plot_clicked()
     timer = new QTimer(this);
     timer->setTimerType(Qt::CoarseTimer); // priority lower
     connect(timer, SIGNAL(timeout()), this, SLOT(updateGraph()));
-    //    timer->start(22); // set thoi gian ve 30ms, lay mau la 10ms nhung ve la 30ms =))
-    //    if(checkVelo == 1)
-    //    {
-    //        timer->start(42);
-    //    }
-    //    if(checkPosi == 1)
-    //    {
-    timer->start(22); // set thoi gian ve 30ms, lay mau la 10ms nhung ve la 30ms =))
-    //    }
-    //    else
-    //    {
-    //        timer_realTime->start(32);
-    //    }
+    timer->start(22); // set thoi gian ve 30ms, lay mau la 10ms nhung ve la 30ms
 }
 
 void MainWindow::on_pushButton_clearGraph_clicked()
 {
     checkClear = 1;
-    //    timer->start(0);
-    //    timer->stop();
-    //    time.elapsed(); // new add 8/4, cho thoi gian dung lai, tra lai gia tri thoi gian va set lai thoi gian = 0 luon
-    //    dataPoints.clear();
-    //    //   ui->customPlot1->clearGraphs();
-    //    ui->customPlot1->clearGraphs(); // new add 8/4
-    //    ui->customPlot1->clearItems();
-    //    ui->customPlot1->graph(0)->data()->clear();
-    //    ui->customPlot1->replot();
-    // //   ui->customPlot1->update(); // new add 8/4
 }
 
 void MainWindow::on_pushButton_plot_2_clicked()
@@ -791,27 +597,13 @@ void MainWindow::on_pushButton_plot_2_clicked()
     checkBtnPlot2 = 1;
     ui->customPlot2->addGraph();                           // tao them 1 line
     ui->customPlot2->graph(0)->setPen(QPen(Qt::green, 2)); // Màu đường line vs độ dày 2 pixel
-    //        // thiet lap doan hien thi tren x, y
-    //    ui->customPlot2->xAxis->setRange(0, 1000);
-    //   ui->customPlot1->yAxis->setRange(-100, 100);
     ui->customPlot2->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
     ui->customPlot2->addGraph();
     ui->customPlot2->graph(1)->setPen(QPen(Qt::red, 2));
     timer_realTime = new QTimer(this);
     timer_realTime->setTimerType(Qt::CoarseTimer);
     connect(timer_realTime, SIGNAL(timeout()), this, SLOT(updateGraph_realTime()));
-    //    if(checkVelo == 1)
-    //    {
-    //        timer_realTime->start(42);
-    //    }
-    //    else if(checkPosi == 1)
-    //    {
-    timer_realTime->start(22); // set thoi gian ve 30ms, lay mau la 10ms nhung ve la 30ms =))
-    //    }
-    //    else
-    //    {
-    //        timer_realTime->start(32);
-    //    }
+    timer_realTime->start(22); // set thoi gian ve 30ms, lay mau la 10ms nhung ve la 30ms
 }
 
 void MainWindow::on_pushButton_reload_clicked()
@@ -874,7 +666,7 @@ void MainWindow::on_actionSave_txt_triggered()
 
 void MainWindow::on_PID1_clicked()
 {
-    float add_play = 0; // add choi de tao thanh 12 byte thoi :))
+    float add_play = 0; // add upto 12 byte
     char choose_PID = 0x88;
     float PID1 = 1;
     byteArray.clear();
@@ -900,7 +692,7 @@ void MainWindow::on_PID1_clicked()
 
 void MainWindow::on_PID2_clicked()
 {
-    float add_play = 0; // add choi de tao thanh 12 byte thoi :))
+    float add_play = 0; // add upto 12 byte
     char choose_PID = 0x88;
     float PID2 = 2;
     byteArray.clear();

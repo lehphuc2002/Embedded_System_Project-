@@ -41,9 +41,7 @@ int8_t SerialProto::serialGetData(uint8_t *pu8Src, uint16_t u16Src_len, uint8_t 
         }
         if (checkFindStart == 0)
         {
-                qDebug() << "dm ko tim thay start la sao";
-                //    return -1;
-                return Phuc_no_valid;
+                return no_valid;
         }
         pu8Src++;
         while (index < PROTO_DATA_SIZE_RX) // do dai data ko co byte ESC
@@ -66,26 +64,20 @@ int8_t SerialProto::serialGetData(uint8_t *pu8Src, uint16_t u16Src_len, uint8_t 
 
         if (*(pu8Src + 2) != PROTO_END_BYTE)
         { // luc nay pu8Src dang o byte CRC dau tien
-                return Phuc_no_valid;
+                return no_valid;
         }
         uint8_t byte1_crc = (crc_check >> 8) & 0xFF;
-//        qDebug() << "byte1_crc la: " << byte1_crc;
- //       qDebug() << "pu8Src la: " << *pu8Src;
         uint8_t byte2_crc = (crc_check)&0xFF;
- //       qDebug() << "byte2_crc la: " << byte2_crc;
-  //      qDebug() << "pu8Src + 1 la: " << *(pu8Src + 1);
         if (*(pu8Src) != byte1_crc || *(++pu8Src) != byte2_crc)
         {
-                return Phuc_false_CRC;
+                return false_CRC;
         }
         *pu16Dest_len = (++pu8Src - pu8Src_start - 4 - checkESC + 1); // do dai data thu duoc, debug thay phai cong 1, vi pu8Src sau ++ dang o stop nen tru start se thieu 1 de tinh do dai
-//        qDebug() << "pu16Dest_len: " << *pu16Dest_len;
         if (*pu16Dest_len != PROTO_DATA_SIZE_RX)
         {
-                return Phuc_false_lenght_data;
+                return false_lenght_data;
         }
-  //      qDebug() << "Right Get Data";
-        return Phuc_right;
+        return rightt;
 }
 
 void SerialProto::serialFrameData(uint8_t *pu8Src, uint16_t u16Src_len, uint8_t *pu8Dest, uint16_t *pu16Dest_len)

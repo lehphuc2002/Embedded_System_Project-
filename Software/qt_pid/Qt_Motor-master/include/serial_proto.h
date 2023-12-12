@@ -15,12 +15,12 @@
 
 typedef enum
 {
-    Phuc_false_lenght_data = -4,
-    Phuc_buffer_small,
-    Phuc_false_CRC,
-    Phuc_no_valid = -1,
-    Phuc_right = 2
-}check_Phuc;
+    false_lenght_data = -4,
+    buffer_small,
+    false_CRC,
+    no_valid = -1,
+    rightt = 2
+}check;
 
 class SerialProto
 {
