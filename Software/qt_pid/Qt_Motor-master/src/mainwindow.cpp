@@ -619,8 +619,8 @@ void MainWindow::on_pushButton_clear_2_clicked()
 
 void MainWindow::on_actionSave_txt_triggered()
 {
-    QString fileGraphLimit = "D:\\Qt Creator\\againSerialPort\\file saved\\graph_limit.jpg";
-    QString fileGraphRealTime = "D:\\Qt Creator\\againSerialPort\\file saved\\graph_realTime.jpg";
+    QString fileGraphLimit = "E:\\BTL_Embedded_System\\Software\\qt_pid\\Qt_Motor-master\\file saved\\graph_limit.jpg";
+    QString fileGraphRealTime = "E:\\BTL_Embedded_System\\Software\\qt_pid\\Qt_Motor-master\\file saved\\graph_realTime.jpg";
     QFile fileGraph1(fileGraphLimit);
     QFile fileGraph2(fileGraphRealTime);
     if (fileGraph1.open(QIODevice::WriteOnly | QIODevice::Text))
@@ -645,7 +645,7 @@ void MainWindow::on_actionSave_txt_triggered()
     }
     fileGraph1.close();
     fileGraph2.close();
-    QString fileTxt = "D:\\Qt Creator\\againSerialPort\\file saved\\data.txt";
+    QString fileTxt = "E:\\BTL_Embedded_System\\Software\\qt_pid\\Qt_Motor-master\\file saved\\data.txt";
     QFile fileData(fileTxt);
 
     if (fileData.open(QIODevice::WriteOnly | QIODevice::Text))
