@@ -25,3 +25,8 @@ void encoder()
 //  //	htim2.Instance->CNT = 0;
 }
 
+/*
+ * pre_speed-> int16_t (-32768->32767), if CNT = 65535, pre = 65520 -> rotate --> CNT overflow = 10, pre = 65535 (= older_pre) = 0 (int16 overflow)
+ * => speed = 10 - 0 = 0
+ *
+ */
