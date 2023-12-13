@@ -48,7 +48,7 @@ extern "C" {
 /* Exported macro ------------------------------------------------------------*/
 /* USER CODE BEGIN EM */
 #define Ts 0.01
-#define Pulseee 11880.0f // 11 xung/vong * 270 (ti so truyen 1:270) *  4 (2 canh xung A va B)
+#define Pulseee 1320.0f // 11 xung/vong * 270 (ti so truyen 1:270) *  4 (2 canh xung A va B)
 /* USER CODE END EM */
 
 void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
